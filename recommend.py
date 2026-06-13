@@ -100,6 +100,5 @@ if __name__ == "__main__":
         uid = 1
 
     recommendations = get_recommendations(uid)
-
     print(json.dumps(recommendations, ensure_ascii=False))
     
