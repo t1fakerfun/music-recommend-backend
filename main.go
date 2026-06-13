@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"bytes"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -319,9 +320,14 @@ func handleRecommend(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cmd := exec.Command("python3", "recommend.py", userID)
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
 	output, err := cmd.Output()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("AIモデルの呼び出しに失敗しました: %v", err), http.StatusInternalServerError)
+		errorMsg := fmt.Sprintf("AIモデルの呼び出しに失敗しました: %v\nPythonエラー内容:\n%s", err, stderr.String())
+		http.Error(w, errorMsg, http.StatusInternalServerError)
 		return
 	}
 

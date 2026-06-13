@@ -1,6 +1,13 @@
 FROM golang:1.21-alpine
-RUN apt-get update && apt-get install -y python3 python3-pip && pip3 install mysql-connector-python --break-system-packages
-RUN apk add --no-cache python3
+
+# Alpineのパッケージマネージャーで python3 と pip の本体をインストール
+RUN apk add --no-cache python3 py3-pip
+
+# ⭕ 【最強の回避策】Python環境に「システム保護を完全無視しろ」という設定ファイルをあらかじめ叩き込む
+RUN mkdir -p ~/.config/pip && echo -e "[global]\nbreak-system-packages = true" > ~/.config/pip/pip.conf
+
+# ⭕ pip自体のアップデートはせず、ダイレクトにライブラリだけをインストールする
+RUN python3 -m pip install mysql-connector-python google-generativeai
 
 WORKDIR /app
 
